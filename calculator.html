@@ -142,11 +142,9 @@
   // 数字ボタンが押されたとき
   function inputNumber(num) {
     if (waitingForNext) {
-      // 演算子の後は新しい数値を入力
       currentInput = num;
       waitingForNext = false;
     } else {
-      // 最大10桁まで入力できる
       if (currentInput.replace('.', '').replace('-', '').length >= 10) return;
       currentInput = currentInput === '0' ? num : currentInput + num;
     }
@@ -167,7 +165,6 @@
   // 演算子ボタン（+, -, ×, ÷）が押されたとき
   function setOperator(op) {
     if (operator && !waitingForNext) {
-      // 前の計算を先に実行する
       calculate();
     }
     previousInput = currentInput;
@@ -183,7 +180,6 @@
     const current = parseFloat(currentInput);
     let result;
 
-    // 演算子に応じて計算する
     switch (operator) {
       case '+': result = prev + current; break;
       case '-': result = prev - current; break;
@@ -198,7 +194,6 @@
         break;
     }
 
-    // 小数点以下の桁数が多すぎる場合は丸める
     currentInput = parseFloat(result.toFixed(10)).toString();
     operator = null;
     previousInput = '';
