@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>計算機</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+      font-family: Arial, sans-serif;
+    }
+
+    .calculator {
+      background-color: #333;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 画面部分 */
+    .display {
+      background-color: #222;
+      color: white;
+      text-align: right;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      font-size: 32px;
+      min-height: 55px;
+      word-break: break-all;
+    }
+
+    /* ボタン全体のレイアウト */
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 70px);
+      gap: 10px;
+    }
+
+    /* ボタンの基本スタイル */
+    button {
+      width: 70px;
+      height: 70px;
+      border: none;
+      border-radius: 5px;
+      font-size: 22px;
+      cursor: pointer;
+      transition: opacity 0.1s;
+    }
+
+    button:active {
+      opacity: 0.7;
+    }
+
+    /* 数字ボタン（グレー） */
+    .btn-number {
+      background-color: #666;
+      color: white;
+    }
+
+    /* 演算子ボタン（オレンジ） */
+    .btn-operator {
+      background-color: #f0a500;
+      color: white;
+    }
+
+    /* AC・その他ボタン（明るいグレー） */
+    .btn-misc {
+      background-color: #999;
+      color: black;
+    }
+
+    /* ＝ボタン（オレンジ） */
+    .btn-equals {
+      background-color: #f0a500;
+      color: white;
+    }
+
+    /* 0ボタンを2列分の幅にする */
+    .btn-zero {
+      grid-column: span 2;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<div class="calculator">
+  <!-- 計算結果を表示する画面 -->
+  <div class="display" id="display">0</div>
+
+  <!-- ボタン群 -->
+  <div class="buttons">
+    <!-- 1行目 -->
+    <button class="btn-misc" onclick="clearAll()">AC</button>
+    <button class="btn-misc" onclick="toggleSign()">+/-</button>
+    <button class="btn-misc" onclick="percent()">%</button>
+    <button class="btn-operator" onclick="setOperator('/')">÷</button>
+
+    <!-- 2行目 -->
+    <button class="btn-number" onclick="inputNumber('7')">7</button>
+    <button class="btn-number" onclick="inputNumber('8')">8</button>
+    <button class="btn-number" onclick="inputNumber('9')">9</button>
+    <button class="btn-operator" onclick="setOperator('*')">×</button>
+
+    <!-- 3行目 -->
+    <button class="btn-number" onclick="inputNumber('4')">4</button>
+    <button class="btn-number" onclick="inputNumber('5')">5</button>
+    <button class="btn-number" onclick="inputNumber('6')">6</button>
+    <button class="btn-operator" onclick="setOperator('-')">−</button>
+
+    <!-- 4行目 -->
+    <button class="btn-number" onclick="inputNumber('1')">1</button>
+    <button class="btn-number" onclick="inputNumber('2')">2</button>
+    <button class="btn-number" onclick="inputNumber('3')">3</button>
+    <button class="btn-operator" onclick="setOperator('+')">+</button>
+
+    <!-- 5行目 -->
+    <button class="btn-number btn-zero" onclick="inputNumber('0')">0</button>
+    <button class="btn-number" onclick="inputDecimal()">.</button>
+    <button class="btn-equals" onclick="calculate()">=</button>
+  </div>
+</div>
+
+<script>
+  // --- 状態管理 ---
+  let currentInput = '0';   // 現在入力中の数値
+  let previousInput = '';   // 前の数値
+  let operator = null;      // 演算子（+, -, *, /）
+  let waitingForNext = false; // 演算子を押した後かどうか
+
+  // 画面を更新する関数
+  function updateDisplay(value) {
+    document.getElementById('display').textContent = value;
+  }
+
+  // 数字ボタンが押されたとき
+  function inputNumber(num) {
+    if (waitingForNext) {
+      // 演算子の後は新しい数値を入力
+      currentInput = num;
+      waitingForNext = false;
+    } else {
+      // 最大10桁まで入力できる
+      if (currentInput.replace('.', '').replace('-', '').length >= 10) return;
+      currentInput = currentInput === '0' ? num : currentInput + num;
+    }
+    updateDisplay(currentInput);
+  }
+
+  // 小数点ボタンが押されたとき
+  function inputDecimal() {
+    if (waitingForNext) {
+      currentInput = '0.';
+      waitingForNext = false;
+    } else if (!currentInput.includes('.')) {
+      currentInput += '.';
+    }
+    updateDisplay(currentInput);
+  }
+
+  // 演算子ボタン（+, -, ×, ÷）が押されたとき
+  function setOperator(op) {
+    if (operator && !waitingForNext) {
+      // 前の計算を先に実行する
+      calculate();
+    }
+    previousInput = currentInput;
+    operator = op;
+    waitingForNext = true;
+  }
+
+  // ＝ボタンが押されたとき
+  function calculate() {
+    if (!operator || waitingForNext) return;
+
+    const prev = parseFloat(previousInput);
+    const current = parseFloat(currentInput);
+    let result;
+
+    // 演算子に応じて計算する
+    switch (operator) {
+      case '+': result = prev + current; break;
+      case '-': result = prev - current; break;
+      case '*': result = prev * current; break;
+      case '/':
+        if (current === 0) {
+          updateDisplay('エラー');
+          clearAll();
+          return;
+        }
+        result = prev / current;
+        break;
+    }
+
+    // 小数点以下の桁数が多すぎる場合は丸める
+    currentInput = parseFloat(result.toFixed(10)).toString();
+    operator = null;
+    previousInput = '';
+    waitingForNext = false;
+    updateDisplay(currentInput);
+  }
+
+  // ACボタン：全てリセット
+  function clearAll() {
+    currentInput = '0';
+    previousInput = '';
+    operator = null;
+    waitingForNext = false;
+    updateDisplay('0');
+  }
+
+  // +/-ボタン：符号を切り替える
+  function toggleSign() {
+    if (currentInput !== '0') {
+      currentInput = currentInput.startsWith('-')
+        ? currentInput.slice(1)
+        : '-' + currentInput;
+      updateDisplay(currentInput);
+    }
+  }
+
+  // %ボタン：100で割る
+  function percent() {
+    currentInput = (parseFloat(currentInput) / 100).toString();
+    updateDisplay(currentInput);
+  }
+
+  // キーボードでも操作できるようにする
+  document.addEventListener('keydown', function(e) {
+    if (e.key >= '0' && e.key <= '9') inputNumber(e.key);
+    else if (e.key === '.') inputDecimal();
+    else if (e.key === '+') setOperator('+');
+    else if (e.key === '-') setOperator('-');
+    else if (e.key === '*') setOperator('*');
+    else if (e.key === '/') { e.preventDefault(); setOperator('/'); }
+    else if (e.key === 'Enter' || e.key === '=') calculate();
+    else if (e.key === 'Escape') clearAll();
+  });
+</script>
+
+</body>
+</html>
