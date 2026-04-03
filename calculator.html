@@ -3,143 +3,290 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>計算機</title>
+  <title>CALC-2000</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
-      background-color: #f0f0f0;
-      font-family: Arial, sans-serif;
+      background: #1a1a1a;
+      font-family: 'Share Tech Mono', 'Courier New', Courier, monospace;
     }
 
-    .calculator {
-      background-color: #333;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    .device {
+      background: linear-gradient(160deg, #2e2e2e 0%, #1c1c1c 60%, #111 100%);
+      border-radius: 18px 18px 22px 22px;
+      padding: 18px 16px 22px;
+      width: 300px;
+      box-shadow:
+        0 0 0 1px #555,
+        0 0 0 2px #222,
+        0 8px 32px rgba(0,0,0,0.8),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      position: relative;
     }
 
-    /* 画面部分 */
+    /* スピーカーグリル */
+    .speaker {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .speaker span {
+      display: block;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #444;
+      box-shadow: inset 0 1px 0 #333;
+    }
+
+    /* ブランドロゴ */
+    .brand {
+      text-align: center;
+      font-size: 9px;
+      letter-spacing: 4px;
+      color: #555;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    /* ディスプレイ枠 */
+    .display-frame {
+      background: #0d0d0d;
+      border-radius: 4px;
+      padding: 4px;
+      margin-bottom: 14px;
+      box-shadow:
+        inset 0 2px 6px rgba(0,0,0,0.9),
+        0 1px 0 rgba(255,255,255,0.04);
+      border: 1px solid #111;
+    }
+
+    /* LCD ディスプレイ */
     .display {
-      background-color: #222;
-      color: white;
+      background: #1a1200;
+      color: #ffb300;
       text-align: right;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 15px;
-      font-size: 32px;
-      min-height: 55px;
+      padding: 10px 12px;
+      border-radius: 2px;
+      font-size: 30px;
+      min-height: 52px;
       word-break: break-all;
+      letter-spacing: 2px;
+      text-shadow:
+        0 0 8px #ffb30099,
+        0 0 2px #ffb300;
+      position: relative;
+      overflow: hidden;
     }
 
-    /* ボタン全体のレイアウト */
+    /* LCD スキャンライン効果 */
+    .display::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 2px,
+        rgba(0,0,0,0.15) 2px,
+        rgba(0,0,0,0.15) 3px
+      );
+      pointer-events: none;
+    }
+
+    /* 式の表示（小さい） */
+    .expression {
+      color: #7a5200;
+      font-size: 11px;
+      text-align: right;
+      min-height: 14px;
+      margin-bottom: 2px;
+      text-shadow: none;
+      letter-spacing: 1px;
+    }
+
+    /* ボタングリッド */
     .buttons {
       display: grid;
-      grid-template-columns: repeat(4, 70px);
-      gap: 10px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
     }
 
-    /* ボタンの基本スタイル */
+    /* ボタン基本スタイル（物理キー風） */
     button {
-      width: 70px;
-      height: 70px;
+      height: 52px;
       border: none;
       border-radius: 5px;
-      font-size: 22px;
+      font-family: 'Share Tech Mono', 'Courier New', Courier, monospace;
+      font-size: 16px;
       cursor: pointer;
-      transition: opacity 0.1s;
+      position: relative;
+      letter-spacing: 1px;
+      transition: transform 0.06s, box-shadow 0.06s;
+      outline: none;
     }
 
     button:active {
-      opacity: 0.7;
+      transform: translateY(3px);
     }
 
-    /* 数字ボタン（グレー） */
+    /* 数字ボタン */
     .btn-number {
-      background-color: #666;
-      color: white;
+      background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+      color: #ddd;
+      box-shadow:
+        0 4px 0 #111,
+        0 5px 6px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+      border-top: 1px solid #484848;
+    }
+    .btn-number:active {
+      box-shadow:
+        0 1px 0 #111,
+        inset 0 1px 2px rgba(0,0,0,0.5);
     }
 
-    /* 演算子ボタン（オレンジ） */
+    /* 演算子ボタン */
     .btn-operator {
-      background-color: #f0a500;
-      color: white;
+      background: linear-gradient(180deg, #1e2d4a 0%, #152038 100%);
+      color: #7aadff;
+      box-shadow:
+        0 4px 0 #0a1220,
+        0 5px 6px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      border-top: 1px solid #253654;
+    }
+    .btn-operator:active {
+      box-shadow:
+        0 1px 0 #0a1220,
+        inset 0 1px 2px rgba(0,0,0,0.5);
     }
 
-    /* AC・その他ボタン（明るいグレー） */
+    /* ACなどのボタン */
     .btn-misc {
-      background-color: #999;
-      color: black;
+      background: linear-gradient(180deg, #4a4a4a 0%, #363636 100%);
+      color: #bbb;
+      box-shadow:
+        0 4px 0 #1a1a1a,
+        0 5px 6px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.12);
+      border-top: 1px solid #565656;
+      font-size: 12px;
+    }
+    .btn-misc:active {
+      box-shadow:
+        0 1px 0 #1a1a1a,
+        inset 0 1px 2px rgba(0,0,0,0.5);
     }
 
-    /* ＝ボタン（オレンジ） */
+    /* イコールボタン */
     .btn-equals {
-      background-color: #f0a500;
-      color: white;
+      background: linear-gradient(180deg, #7a3a00 0%, #5a2a00 100%);
+      color: #ffb300;
+      box-shadow:
+        0 4px 0 #2a1000,
+        0 5px 6px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,200,0,0.15);
+      border-top: 1px solid #8a4500;
+      text-shadow: 0 0 6px #ffb30077;
+    }
+    .btn-equals:active {
+      box-shadow:
+        0 1px 0 #2a1000,
+        inset 0 1px 2px rgba(0,0,0,0.5);
     }
 
-    /* 0ボタンを2列分の幅にする */
+    /* 0ボタンを2列分 */
     .btn-zero {
       grid-column: span 2;
-      width: 100%;
+    }
+
+    /* 下部のロゴ */
+    .footer {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 8px;
+      letter-spacing: 3px;
+      color: #333;
     }
   </style>
 </head>
 <body>
 
-<div class="calculator">
-  <!-- 計算結果を表示する画面 -->
-  <div class="display" id="display">0</div>
+<div class="device">
+  <!-- スピーカーグリル -->
+  <div class="speaker">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
 
-  <!-- ボタン群 -->
+  <div class="brand">BlackCalc</div>
+
+  <!-- ディスプレイ -->
+  <div class="display-frame">
+    <div class="display">
+      <div class="expression" id="expression"></div>
+      <div id="display">0</div>
+    </div>
+  </div>
+
+  <!-- ボタン -->
   <div class="buttons">
-    <!-- 1行目 -->
     <button class="btn-misc" onclick="clearAll()">AC</button>
     <button class="btn-misc" onclick="toggleSign()">+/-</button>
     <button class="btn-misc" onclick="percent()">%</button>
-    <button class="btn-operator" onclick="setOperator('/')">÷</button>
+    <button class="btn-operator" onclick="setOperator('/')">&#247;</button>
 
-    <!-- 2行目 -->
     <button class="btn-number" onclick="inputNumber('7')">7</button>
     <button class="btn-number" onclick="inputNumber('8')">8</button>
     <button class="btn-number" onclick="inputNumber('9')">9</button>
-    <button class="btn-operator" onclick="setOperator('*')">×</button>
+    <button class="btn-operator" onclick="setOperator('*')">&#215;</button>
 
-    <!-- 3行目 -->
     <button class="btn-number" onclick="inputNumber('4')">4</button>
     <button class="btn-number" onclick="inputNumber('5')">5</button>
     <button class="btn-number" onclick="inputNumber('6')">6</button>
-    <button class="btn-operator" onclick="setOperator('-')">−</button>
+    <button class="btn-operator" onclick="setOperator('-')">&minus;</button>
 
-    <!-- 4行目 -->
     <button class="btn-number" onclick="inputNumber('1')">1</button>
     <button class="btn-number" onclick="inputNumber('2')">2</button>
     <button class="btn-number" onclick="inputNumber('3')">3</button>
     <button class="btn-operator" onclick="setOperator('+')">+</button>
 
-    <!-- 5行目 -->
     <button class="btn-number btn-zero" onclick="inputNumber('0')">0</button>
     <button class="btn-number" onclick="inputDecimal()">.</button>
     <button class="btn-equals" onclick="calculate()">=</button>
   </div>
+
+  <div class="footer">MODEL BB-CALC &bull; 2003</div>
 </div>
 
 <script>
-  // --- 状態管理 ---
-  let currentInput = '0';   // 現在入力中の数値
-  let previousInput = '';   // 前の数値
-  let operator = null;      // 演算子（+, -, *, /）
-  let waitingForNext = false; // 演算子を押した後かどうか
+  let currentInput = '0';
+  let previousInput = '';
+  let operator = null;
+  let waitingForNext = false;
 
-  // 画面を更新する関数
   function updateDisplay(value) {
     document.getElementById('display').textContent = value;
   }
 
-  // 数字ボタンが押されたとき
+  function updateExpression(text) {
+    document.getElementById('expression').textContent = text;
+  }
+
   function inputNumber(num) {
     if (waitingForNext) {
       currentInput = num;
@@ -151,7 +298,6 @@
     updateDisplay(currentInput);
   }
 
-  // 小数点ボタンが押されたとき
   function inputDecimal() {
     if (waitingForNext) {
       currentInput = '0.';
@@ -162,7 +308,10 @@
     updateDisplay(currentInput);
   }
 
-  // 演算子ボタン（+, -, ×, ÷）が押されたとき
+  function opSymbol(op) {
+    return {'+':'+', '-':'-', '*':'x', '/':'/'}[op] || op;
+  }
+
   function setOperator(op) {
     if (operator && !waitingForNext) {
       calculate();
@@ -170,30 +319,29 @@
     previousInput = currentInput;
     operator = op;
     waitingForNext = true;
+    updateExpression(previousInput + ' ' + opSymbol(op));
   }
 
-  // ＝ボタンが押されたとき
   function calculate() {
     if (!operator || waitingForNext) return;
-
     const prev = parseFloat(previousInput);
     const current = parseFloat(currentInput);
     let result;
-
     switch (operator) {
       case '+': result = prev + current; break;
       case '-': result = prev - current; break;
       case '*': result = prev * current; break;
       case '/':
         if (current === 0) {
-          updateDisplay('エラー');
+          updateDisplay('ERROR');
+          updateExpression('DIV/0');
           clearAll();
           return;
         }
         result = prev / current;
         break;
     }
-
+    updateExpression(previousInput + ' ' + opSymbol(operator) + ' ' + currentInput + ' =');
     currentInput = parseFloat(result.toFixed(10)).toString();
     operator = null;
     previousInput = '';
@@ -201,16 +349,15 @@
     updateDisplay(currentInput);
   }
 
-  // ACボタン：全てリセット
   function clearAll() {
     currentInput = '0';
     previousInput = '';
     operator = null;
     waitingForNext = false;
     updateDisplay('0');
+    updateExpression('');
   }
 
-  // +/-ボタン：符号を切り替える
   function toggleSign() {
     if (currentInput !== '0') {
       currentInput = currentInput.startsWith('-')
@@ -220,13 +367,11 @@
     }
   }
 
-  // %ボタン：100で割る
   function percent() {
     currentInput = (parseFloat(currentInput) / 100).toString();
     updateDisplay(currentInput);
   }
 
-  // キーボードでも操作できるようにする
   document.addEventListener('keydown', function(e) {
     if (e.key >= '0' && e.key <= '9') inputNumber(e.key);
     else if (e.key === '.') inputDecimal();
